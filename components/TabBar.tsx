@@ -23,10 +23,10 @@ export function TabBar({ active, onChange }: Props) {
             key={t.id}
             type="button"
             onClick={() => onChange(t.id)}
-            className={`px-4 py-2.5 text-sm transition-colors ${
+            className={`px-4 py-2.5 text-sm transition-colors -mb-px border-b-2 ${
               isActive
-                ? "border-b-2 border-text text-text"
-                : "text-muted hover:text-text"
+                ? "border-text text-text"
+                : "border-transparent text-muted hover:text-text"
             }`}
           >
             {t.label}

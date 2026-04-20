@@ -1,6 +1,6 @@
 type Props = { paragraphs: string[] };
 
-function renderWithBold(text: string): React.ReactNode[] {
+function renderWithBold(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
