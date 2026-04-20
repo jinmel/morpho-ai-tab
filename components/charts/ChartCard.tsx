@@ -14,7 +14,7 @@ export function ChartCard({ label, className, children }: Props) {
       <div className="text-[11px] uppercase tracking-wide text-muted mb-2">
         {label}
       </div>
-      <div className="flex-1 min-h-0">{children}</div>
+      <div className="flex-1 min-h-0 h-full">{children}</div>
     </div>
   );
 }

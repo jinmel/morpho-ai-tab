@@ -70,7 +70,7 @@ export const riskScores: RiskScores = {
 
 export type ApyContributionSlice = { name: string; pts: number; color: string };
 export const apyContribution: ApyContributionSlice[] = [
-  { name: "Steakhouse USDC",    pts:  4.9, color: "#4ade80" },
+  { name: "Steakhouse USDC",    pts:  4.92, color: "#4ade80" },
   { name: "Gauntlet WETH Core", pts:  2.0, color: "#60a5fa" },
   { name: "WETH / USDC borrow", pts: -0.5, color: "#f87171" },
 ];

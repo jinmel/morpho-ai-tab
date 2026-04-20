@@ -38,7 +38,7 @@ export function RiskRadar() {
 
   return (
     <div className="flex items-center justify-center h-full">
-      <svg viewBox="0 0 140 120" className="w-full" style={{ maxHeight: 130 }}>
+      <svg viewBox="0 0 150 120" className="w-full" style={{ maxHeight: 130 }}>
         <polygon points={polygon(outerPts)} fill="none" stroke="#232634" strokeWidth="1" />
         <polygon
           points={polygon(scorePts)}
