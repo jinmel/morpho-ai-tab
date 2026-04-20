@@ -40,8 +40,53 @@ export const activity: ActivityRow[] = [
 ];
 
 export const aiSummaryParagraphs: string[] = [
-  "Your wallet holds **$142K in supplied assets** across two vaults, with a moderate **$13.7K borrow** against WETH collateral on Base. Your overall net APY of **+6.42%** is driven primarily by Steakhouse USDC, which accounts for roughly 42% of your deployed capital.",
-  "The portfolio is **concentrated in stablecoin yield**, which has historically been lower-variance but exposes you to stablecoin-specific risks (peg deviation, underlying collateral composition of vaults). Your ETH exposure is primarily indirect through Gauntlet WETH Core.",
-  "**Risk exposure is currently healthy.** Your borrow position on Base has a health factor of 1.82 — comfortable but worth monitoring if ETH moves sharply downward. A 30% drop in ETH would push health factor below 1.3.",
-  "Consider diversifying across additional vault curators or chains if you want to reduce concentration risk. Your current setup is well-suited for a moderate-risk yield profile.",
+  "Your wallet holds **$142K in supplied assets** across two vaults, with a moderate **$13.7K borrow**. Net APY **+6.42%**, driven primarily by Steakhouse USDC (~42% of deployed capital).",
+  "The portfolio is **concentrated in stablecoin yield** — historically lower-variance but with stablecoin-specific risks (peg deviation, vault collateral composition). Your ETH exposure is primarily indirect through Gauntlet WETH Core.",
+  "**Risk is healthy.** Health factor sits at **1.82**, and a 30% drop in ETH would push it to roughly **1.28** — still above the 1.0 liquidation threshold. Diversifying across more vault curators or chains would reduce concentration risk.",
+];
+
+export type AllocationSlice = { name: string; valueUsd: number; pct: number; color: string };
+export const allocationData: AllocationSlice[] = [
+  { name: "Steakhouse USDC",    valueUsd: 60000, pct: 42, color: "#4ade80" },
+  { name: "Gauntlet WETH Core", valueUsd: 82100, pct: 58, color: "#60a5fa" },
+];
+
+export const healthFactor = 1.82;
+
+export type RiskScores = {
+  concentration: number;
+  liquidation: number;
+  yieldQuality: number;
+  chainDiversity: number;
+  assetDiversity: number;
+};
+export const riskScores: RiskScores = {
+  concentration:  6.5,
+  liquidation:    3.0,
+  yieldQuality:   7.5,
+  chainDiversity: 5.0,
+  assetDiversity: 4.0,
+};
+
+export type ApyContributionSlice = { name: string; pts: number; color: string };
+export const apyContribution: ApyContributionSlice[] = [
+  { name: "Steakhouse USDC",    pts:  4.9, color: "#4ade80" },
+  { name: "Gauntlet WETH Core", pts:  2.0, color: "#60a5fa" },
+  { name: "WETH / USDC borrow", pts: -0.5, color: "#f87171" },
+];
+
+export type ChainSlice = { name: string; pct: number; color: string };
+export const chainDistribution: ChainSlice[] = [
+  { name: "Base",     pct: 52, color: "#60a5fa" },
+  { name: "Ethereum", pct: 48, color: "#a78bfa" },
+];
+
+export type StressPoint = { ethDropPct: number; hf: number };
+export const stressCurve: StressPoint[] = [
+  { ethDropPct:  0, hf: 1.82 },
+  { ethDropPct: 10, hf: 1.62 },
+  { ethDropPct: 20, hf: 1.45 },
+  { ethDropPct: 30, hf: 1.28 },
+  { ethDropPct: 40, hf: 1.12 },
+  { ethDropPct: 50, hf: 0.96 },
 ];
