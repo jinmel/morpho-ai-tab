@@ -1,0 +1,36 @@
+<h2>AI tab — which content layout?</h2>
+<p class="subtitle">The Positions and Activity tabs are tabular. The AI tab is the new idea — what shape should it take?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Narrative Summary</h3>
+      <p>One hero block of generated prose: "Your portfolio is concentrated in stablecoins on Base, with a moderate borrow position against ETH collateral. Health factor is healthy at 2.1…" Reads like an analyst memo. Minimal structure.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Structured Risk Cards</h3>
+      <p>Grid of cards: Overall Risk Score, Concentration Risk, Liquidation Risk, Yield Quality, Suggested Actions. Each card has a metric + 2-3 sentences of AI-generated explanation. Scannable, dashboard-feel.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Hybrid: Summary + Risk Cards + Chat</h3>
+      <p>Hero narrative summary at top, structured risk cards in the middle, and a chat input at the bottom ("Ask about your positions…"). Shows both the proactive analysis and the interactive Q&A potential.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="d" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>Chat-First</h3>
+      <p>The whole tab is a chat interface, with one starter message from the AI summarizing the wallet, plus suggested follow-up prompts ("What's my biggest risk?", "How could I improve yield?"). Minimal scaffolding around it.</p>
+    </div>
+  </div>
+</div>

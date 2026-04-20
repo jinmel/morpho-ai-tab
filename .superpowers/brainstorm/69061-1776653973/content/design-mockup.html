@@ -1,0 +1,107 @@
+<h2>Proposed layout</h2>
+<p class="subtitle">Morpho dashboard scaffolding with the new AI tab. Rough fidelity preview — final will use Morpho's actual dark theme.</p>
+
+<div class="label">Dashboard shell (shared across tabs)</div>
+<div class="mockup" style="margin-bottom: 24px;">
+  <div class="mockup-header">app.morpho.org/dashboard/0x96a2...e856</div>
+  <div class="mockup-body" style="background:#0f1117; color:#e8e8ea; padding:0;">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid #232634;">
+      <div style="display:flex; gap:24px; align-items:center;">
+        <strong>Morpho</strong>
+        <span style="opacity:0.6">Earn</span>
+        <span style="opacity:0.6">Borrow</span>
+        <span style="opacity:0.6">Explore</span>
+        <span>Dashboard</span>
+      </div>
+      <div style="padding:6px 12px; border:1px solid #2a2e3d; border-radius:999px;">0x96a2…e856</div>
+    </div>
+
+    <div style="padding:24px 20px;">
+      <div style="font-size:20px; margin-bottom:4px;">Dashboard</div>
+      <div style="opacity:0.5; font-size:13px; margin-bottom:20px;">0x96a2e1Cb…9a9e856</div>
+
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:24px;">
+        <div style="background:#181b24; padding:14px; border-radius:8px;"><div style="opacity:0.5; font-size:11px;">NET WORTH</div><div style="font-size:18px; margin-top:6px;">$128,420</div></div>
+        <div style="background:#181b24; padding:14px; border-radius:8px;"><div style="opacity:0.5; font-size:11px;">SUPPLIED</div><div style="font-size:18px; margin-top:6px;">$142,100</div></div>
+        <div style="background:#181b24; padding:14px; border-radius:8px;"><div style="opacity:0.5; font-size:11px;">BORROWED</div><div style="font-size:18px; margin-top:6px;">$13,680</div></div>
+        <div style="background:#181b24; padding:14px; border-radius:8px;"><div style="opacity:0.5; font-size:11px;">NET APY</div><div style="font-size:18px; margin-top:6px; color:#4ade80;">+6.42%</div></div>
+      </div>
+
+      <div style="display:flex; gap:4px; border-bottom:1px solid #232634; margin-bottom:16px;">
+        <div style="padding:10px 16px; border-bottom:2px solid #e8e8ea;">Positions</div>
+        <div style="padding:10px 16px; opacity:0.6;">Activity</div>
+        <div style="padding:10px 16px; opacity:0.6;">AI ✨</div>
+      </div>
+
+      <div style="background:#181b24; border-radius:8px; padding:12px 16px; margin-bottom:8px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:12px;">
+        <div style="opacity:0.5; font-size:11px;">VAULT / MARKET</div>
+        <div style="opacity:0.5; font-size:11px;">BALANCE</div>
+        <div style="opacity:0.5; font-size:11px;">APY</div>
+        <div style="opacity:0.5; font-size:11px;">CHAIN</div>
+      </div>
+      <div style="background:#13151d; border-radius:8px; padding:14px 16px; margin-bottom:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:12px;">
+        <div>Steakhouse USDC</div><div>$60,000</div><div style="color:#4ade80;">8.1%</div><div>Base</div>
+      </div>
+      <div style="background:#13151d; border-radius:8px; padding:14px 16px; margin-bottom:6px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:12px;">
+        <div>Gauntlet WETH Core</div><div>$52,100</div><div style="color:#4ade80;">4.8%</div><div>Ethereum</div>
+      </div>
+      <div style="background:#13151d; border-radius:8px; padding:14px 16px; display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:12px;">
+        <div>WETH / USDC market</div><div>-$13,680</div><div style="color:#f87171;">-5.2%</div><div>Base</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="label">AI tab (selected)</div>
+<div class="mockup">
+  <div class="mockup-header">AI tab content</div>
+  <div class="mockup-body" style="background:#0f1117; color:#e8e8ea; padding:28px;">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="font-size:18px;">✨</div>
+        <div>
+          <div style="font-size:16px;">Portfolio Summary</div>
+          <div style="opacity:0.5; font-size:12px;">Generated just now · AI-powered analysis</div>
+        </div>
+      </div>
+      <div style="padding:6px 12px; border:1px solid #2a2e3d; border-radius:6px; font-size:12px;">Regenerate</div>
+    </div>
+
+    <div style="background:#131520; border:1px solid #232634; border-radius:12px; padding:28px; line-height:1.7; font-size:15px;">
+      <p style="margin:0 0 14px 0;">Your wallet holds <strong>$142K in supplied assets</strong> across two vaults, with a moderate <strong>$13.7K borrow</strong> against WETH collateral on Base. Your overall net APY of <strong>+6.42%</strong> is driven primarily by Steakhouse USDC, which accounts for roughly 42% of your deployed capital.</p>
+      <p style="margin:0 0 14px 0;">The portfolio is <strong>concentrated in stablecoin yield</strong>, which has historically been lower-variance but exposes you to stablecoin-specific risks (peg deviation, underlying collateral composition of vaults). Your ETH exposure is primarily indirect through Gauntlet WETH Core.</p>
+      <p style="margin:0 0 14px 0;"><strong>Risk exposure is currently healthy.</strong> Your borrow position on Base has a health factor of 1.82 — comfortable but worth monitoring if ETH moves sharply downward. A 30% drop in ETH would push health factor below 1.3.</p>
+      <p style="margin:0; opacity:0.8;">Consider diversifying across additional vault curators or chains if you want to reduce concentration risk. Your current setup is well-suited for a moderate-risk yield profile.</p>
+    </div>
+
+    <div style="opacity:0.4; font-size:11px; margin-top:16px; line-height:1.6;">AI-generated analysis based on on-chain position data. Not financial advice. Always do your own research before making decisions.</div>
+
+  </div>
+</div>
+
+<div style="margin-top: 32px; padding: 16px 20px; background: rgba(74,222,128,0.06); border-left: 3px solid #4ade80; border-radius: 4px;">
+  <div class="label" style="color:#4ade80;">What's in scope</div>
+  <ul style="margin: 8px 0 0 0; padding-left: 20px; line-height: 1.8;">
+    <li>Next.js + Tailwind app, single page at <code>/dashboard/[address]</code></li>
+    <li>Shared header + summary metric cards + tab bar</li>
+    <li>Positions tab: static table of supplied/borrowed rows</li>
+    <li>Activity tab: static table of transaction history rows</li>
+    <li>AI tab: narrative summary block (hard-coded paragraphs), Regenerate button is cosmetic</li>
+    <li>Hardcoded placeholder data in a single <code>data.ts</code> file</li>
+    <li>High-fidelity styling to match Morpho's dark theme</li>
+  </ul>
+</div>
+
+<div style="margin-top: 12px; padding: 16px 20px; background: rgba(248,113,113,0.06); border-left: 3px solid #f87171; border-radius: 4px;">
+  <div class="label" style="color:#f87171;">Out of scope</div>
+  <ul style="margin: 8px 0 0 0; padding-left: 20px; line-height: 1.8;">
+    <li>Wallet connection, real on-chain data, Morpho MCP calls</li>
+    <li>Working Regenerate button, actual LLM integration</li>
+    <li>Other pages (Earn, Borrow, Explore) — links in the nav are non-functional</li>
+    <li>Responsive mobile layout (desktop only — designer preview)</li>
+    <li>Dark/light theme toggle, settings, any interactive controls beyond tab switching</li>
+  </ul>
+</div>

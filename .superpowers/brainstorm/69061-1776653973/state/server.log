@@ -1,0 +1,7 @@
+{"type":"server-started","port":63187,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:63187","screen_dir":"/Users/jinsuk/code/morpho-demo3/.superpowers/brainstorm/69061-1776653973/content","state_dir":"/Users/jinsuk/code/morpho-demo3/.superpowers/brainstorm/69061-1776653973/state"}
+{"type":"screen-added","file":"/Users/jinsuk/code/morpho-demo3/.superpowers/brainstorm/69061-1776653973/content/waiting.html"}
+{"type":"screen-added","file":"/Users/jinsuk/code/morpho-demo3/.superpowers/brainstorm/69061-1776653973/content/ai-tab-options.html"}
+{"source":"user-event","type":"click","text":"A\n    \n      Narrative Summary\n      One hero block of generated prose: \"Your portfolio is concentrated in stablecoins on Base, with a moderate borrow position against ETH collateral. Health factor is healthy at 2.1…\" Reads like an analyst memo. Minimal structure.","choice":"a","id":null,"timestamp":1776654103799}
+{"type":"screen-added","file":"/Users/jinsuk/code/morpho-demo3/.superpowers/brainstorm/69061-1776653973/content/design-mockup.html"}
+{"type":"screen-added","file":"/Users/jinsuk/code/morpho-demo3/.superpowers/brainstorm/69061-1776653973/content/waiting-2.html"}
+{"type":"server-stopped","reason":"idle timeout"}
