@@ -1,23 +1,42 @@
 import { NextRequest } from "next/server";
-import { streamText, stepCountIs } from "ai";
+import { streamText, stepCountIs, Output, jsonSchema } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
+import type { Spec } from "@json-render/core";
 import { createMorphoMCPSession } from "@/lib/ai/mcp";
 import { SYSTEM_PROMPT } from "@/lib/ai/systemPrompt";
-import { UiSchema } from "@/lib/ai/schema";
+import { catalog } from "@/lib/ai/schema";
 import { type AgentEvent, summarizeToolArgs, summarizeToolResult } from "@/lib/ai/events";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-function extractJson(text: string): unknown {
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const body = fenced ? fenced[1] : text;
-  const first = body.indexOf("{");
-  const last = body.lastIndexOf("}");
-  if (first === -1 || last === -1) throw new Error("No JSON object in model output");
-  return JSON.parse(body.slice(first, last + 1));
-}
+/**
+ * Hand-crafted JSON Schema for the Spec type.
+ * We cannot use catalog.zodSchema() with Output.object() because the
+ * @json-render/core custom ZodObject doesn't serialize via zod-to-json-schema,
+ * and the resulting Record<string,UIElement> triggers `propertyNames` which
+ * Anthropic's structured-output API rejects. Using additionalProperties instead.
+ */
+const SPEC_JSON_SCHEMA = jsonSchema<Spec>({
+  type: "object",
+  properties: {
+    root: { type: "string" },
+    elements: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        properties: {
+          type: { type: "string" },
+          props: { type: "object" },
+          children: { type: "array", items: { type: "string" } },
+        },
+        required: ["type", "props"],
+      },
+    },
+  },
+  required: ["root", "elements"],
+});
 
 function safeStringify(v: unknown, max: number): string {
   try {
@@ -72,9 +91,17 @@ Task: Produce the JSON UI describing this wallet's Morpho portfolio. Start by ca
             tools: session.tools,
             stopWhen: stepCountIs(8),
             abortSignal: AbortSignal.any([req.signal, internalAbort.signal]),
+            experimental_output: Output.object({ schema: SPEC_JSON_SCHEMA }),
+            providerOptions: {
+              // Anthropic's output_config.format rejects additionalProperties with
+              // a schema value (needed for Record<string,UIElement>). jsonTool mode
+              // routes structured output through a function tool instead, which has
+              // no such restriction.
+              anthropic: { structuredOutputMode: "jsonTool" },
+            },
           });
 
-          // MUST iterate fullStream to completion before awaiting result.text — see Risk #2
+          // MUST iterate fullStream to completion before awaiting result.output — see Risk #2
           for await (const part of result.fullStream) {
             switch (part.type) {
               case "tool-input-start":
@@ -112,6 +139,12 @@ Task: Produce the JSON UI describing this wallet's Morpho portfolio. Start by ca
                   ok: false,
                 });
                 break;
+              case "error":
+                emit({ type: "error", message: "stream-error: " + String(part.error).slice(0, 200) });
+                return;
+              case "abort":
+                // Client disconnected — expected termination, exit cleanly
+                return;
               default:
                 break;
             }
@@ -121,32 +154,27 @@ Task: Produce the JSON UI describing this wallet's Morpho portfolio. Start by ca
 
           emit({ type: "status", text: "Validating output…" });
 
-          let text: string;
+          const finishReason = await Promise.resolve(result.finishReason).catch(() => undefined);
+          if (!finishReason || finishReason === "tool-calls") {
+            emit({ type: "error", message: "step-budget: model exhausted 8 steps without valid JSON" });
+            return;
+          }
+
+          let parsed: Spec;
           try {
-            text = await result.text;
+            parsed = await result.output as Spec;
           } catch (e) {
             emit({ type: "error", message: `model: ${(e as Error).message}` });
             return;
           }
 
-          const finishReason = await Promise.resolve(result.finishReason).catch(() => undefined);
-          if (!text || text.trim() === "") {
-            emit({ type: "error", message: "step-budget: model exhausted 8 steps without valid JSON" });
+          const validated = catalog.validate(parsed);
+          if (!validated.success || !validated.data) {
+            const msg = validated.error?.issues?.[0]?.message ?? "spec does not match catalog";
+            emit({ type: "error", message: `validation: ${msg}` });
             return;
           }
-
-          if (finishReason === "tool-calls") {
-            emit({ type: "error", message: "step-budget: model exhausted 8 steps without valid JSON" });
-            return;
-          }
-
-          try {
-            const parsed = extractJson(text);
-            const validated = UiSchema.parse(parsed);
-            emit({ type: "complete", ui: validated });
-          } catch (e) {
-            emit({ type: "error", message: `validation: ${(e as Error).message}` });
-          }
+          emit({ type: "complete", spec: validated.data as Spec });
         } finally {
           await session.close();
         }

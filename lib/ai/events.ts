@@ -1,14 +1,25 @@
-import type { Ui } from "@/lib/ai/schema";
+import type { Spec } from "@json-render/core";
 
 export type AgentEvent =
   | { type: "tool-call";   id: string; name: string; argsSummary: string }
   | { type: "tool-result"; id: string; name: string; resultSummary: string; details?: string; ok: boolean }
   | { type: "status";      text: string }
-  | { type: "complete";    ui: Ui }
+  | { type: "complete";    spec: Spec }
   | { type: "error";       message: string };
 
 function isObj(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+// MCP tool results arrive as { content: [{ type: "text", text: "<JSON string>" }] }.
+// Unwrap to the inner payload object, or return the input unchanged if the shape is different.
+function unwrapMcp(output: unknown): unknown {
+  if (!isObj(output)) return output;
+  const content = output.content;
+  if (!Array.isArray(content) || content.length === 0) return output;
+  const first = content[0];
+  if (!isObj(first) || typeof first.text !== "string") return output;
+  try { return JSON.parse(first.text); } catch { return output; }
 }
 
 function safeJson(val: unknown, limit = 80): string {
@@ -46,34 +57,29 @@ export function summarizeToolArgs(name: string, args: unknown): string {
 export function summarizeToolResult(name: string, output: unknown): string {
   try {
     if (name === "morpho_get_positions") {
-      if (isObj(output)) {
-        const chain = typeof output.chain === "string" ? output.chain : "unknown";
-        const supplyCount = Array.isArray(output.supplyPositions) ? output.supplyPositions.length : 0;
-        const borrowCount = Array.isArray(output.borrowPositions) ? output.borrowPositions.length : 0;
-        if (supplyCount === 0 && borrowCount === 0) return `empty (no positions on ${chain})`;
-        return `${supplyCount} supply, ${borrowCount} borrow on ${chain}`;
-      }
-      if (Array.isArray(output)) {
-        const supply = output.filter((p) => isObj(p) && p.kind === "supply").length;
-        const borrow = output.filter((p) => isObj(p) && p.kind === "borrow").length;
-        if (supply === 0 && borrow === 0) return "empty (no positions)";
-        return `${supply} supply, ${borrow} borrow`;
+      const payload = unwrapMcp(output);
+      if (isObj(payload)) {
+        const chain = typeof payload.chain === "string" ? payload.chain : "unknown";
+        const vaultCount = Array.isArray(payload.vaultPositions) ? payload.vaultPositions.length : 0;
+        const marketCount = Array.isArray(payload.marketPositions) ? payload.marketPositions.length : 0;
+        if (vaultCount === 0 && marketCount === 0) return `empty (no positions on ${chain})`;
+        return `${vaultCount} vault, ${marketCount} market on ${chain}`;
       }
       return safeJson(output);
     }
     if (name === "morpho_get_vault" || name === "morpho_get_market") {
       const kind = name === "morpho_get_vault" ? "vault" : "market";
-      if (isObj(output)) {
+      const payload = unwrapMcp(output);
+      if (isObj(payload)) {
         const symbol =
-          typeof output.symbol === "string" ? output.symbol
-          : isObj(output.asset) && typeof output.asset.symbol === "string" ? output.asset.symbol
+          typeof payload.symbol === "string" ? payload.symbol
+          : isObj(payload.asset) && typeof payload.asset.symbol === "string" ? payload.asset.symbol
           : null;
         const rawApy =
-          typeof output.apy === "number" ? output.apy
-          : typeof output.supplyApy === "number" ? output.supplyApy
-          : typeof output.netApy === "number" ? output.netApy
+          typeof payload.apy === "number" ? payload.apy
+          : typeof payload.supplyApy === "number" ? payload.supplyApy
+          : typeof payload.netApy === "number" ? payload.netApy
           : null;
-        // MCP returns APY as a decimal (0.0642) — multiply by 100
         const apyPct = rawApy !== null ? rawApy * 100 : null;
         if (symbol && apyPct !== null) return `${symbol} ${kind} · ${apyPct.toFixed(2)}% APY`;
         if (symbol) return `${symbol} ${kind}`;

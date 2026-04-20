@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { AgentEvent } from "./events";
-import type { Ui } from "./schema";
+import type { Spec } from "@json-render/core";
 
 // ---------- module-scoped cache (LRU, cap 16, TTL 5 min) ----------
 
 const CACHE_TTL = 5 * 60 * 1000;
 const CACHE_CAP = 16;
 
-type CacheEntry = { ui: Ui; events: AgentEvent[]; ts: number };
+type CacheEntry = { spec: Spec; events: AgentEvent[]; ts: number };
 const cache = new Map<string, CacheEntry>();
 
 function cacheRead(address: string): CacheEntry | null {
@@ -22,34 +22,30 @@ function cacheRead(address: string): CacheEntry | null {
   return entry;
 }
 
-function cacheWrite(address: string, ui: Ui, events: AgentEvent[]) {
+function cacheWrite(address: string, spec: Spec, events: AgentEvent[]) {
   if (cache.size >= CACHE_CAP) {
     cache.delete(cache.keys().next().value!);
   }
-  cache.set(address, { ui, events, ts: Date.now() });
+  cache.set(address, { spec, events, ts: Date.now() });
 }
 
 function cacheDelete(address: string) {
   cache.delete(address);
 }
 
-// ---------- in-flight dedupe (strict-mode double-mount) ----------
-
-const inFlight = new Map<string, Promise<void>>();
-
 // ---------- hook ----------
 
 export type GeneratedUiState = {
   status: "idle" | "loading" | "ready" | "error";
   events: AgentEvent[];
-  ui: Ui | null;
+  spec: Spec | null;
   error: Error | null;
   regenerate: () => void;
 };
 
 export function useGeneratedUi(address: string): GeneratedUiState {
   const [events, setEvents] = useState<AgentEvent[]>([]);
-  const [ui, setUi] = useState<Ui | null>(null);
+  const [spec, setSpec] = useState<Spec | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [nonce, setNonce] = useState(0);
@@ -59,14 +55,9 @@ export function useGeneratedUi(address: string): GeneratedUiState {
     setNonce((n) => n + 1);
   }, [address]);
 
-  // Fix react-hooks/refs: update ref in an effect, not during render
-  const nonceRef = useRef(nonce);
-  useEffect(() => { nonceRef.current = nonce; }, [nonce]);
-
   useEffect(() => {
     if (!address) return;
 
-    const capturedNonce = nonce;
     const abortController = new AbortController();
 
     const cached = cacheRead(address);
@@ -74,37 +65,19 @@ export function useGeneratedUi(address: string): GeneratedUiState {
       // Cache hydration is the intended effect of address/nonce changing — not a cascade.
       /* eslint-disable react-hooks/set-state-in-effect */
       setEvents(cached.events);
-      setUi(cached.ui);
+      setSpec(cached.spec);
       setError(null);
       setStatus("ready");
       /* eslint-enable react-hooks/set-state-in-effect */
       return;
     }
 
-    const inFlightKey = `${address}:${capturedNonce}`;
-
-    const existing = inFlight.get(inFlightKey);
-    if (existing) {
-      setStatus("loading");
-      existing.then(() => {
-        if (nonceRef.current !== capturedNonce || abortController.signal.aborted) return;
-        const c = cacheRead(address);
-        if (c) {
-          setEvents(c.events);
-          setUi(c.ui);
-          setError(null);
-          setStatus("ready");
-        }
-      });
-      return () => { abortController.abort(); };
-    }
-
     setEvents([]);
-    setUi(null);
+    setSpec(null);
     setError(null);
     setStatus("loading");
 
-    const run = async () => {
+    (async () => {
       const t0 = performance.now();
 
       let res: Response;
@@ -123,6 +96,7 @@ export function useGeneratedUi(address: string): GeneratedUiState {
       }
 
       if (!res.body) {
+        if (abortController.signal.aborted) return;
         setError(new Error("No response body"));
         setStatus("error");
         return;
@@ -154,7 +128,7 @@ export function useGeneratedUi(address: string): GeneratedUiState {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          if (abortController.signal.aborted) break;
+          if (abortController.signal.aborted) return;
 
           buf += decoder.decode(value, { stream: true });
           const lines = buf.split("\n");
@@ -167,13 +141,10 @@ export function useGeneratedUi(address: string): GeneratedUiState {
             let evt: AgentEvent;
             try { evt = JSON.parse(trimmed) as AgentEvent; } catch { continue; }
 
-            if (nonceRef.current !== capturedNonce) return;
-
             if (evt.type === "complete") {
-              setUi(evt.ui);
+              setSpec(evt.spec);
               setStatus("ready");
-              // Write cache synchronously using localEvents (mirrors React state without awaiting it)
-              cacheWrite(address, evt.ui, localEvents);
+              cacheWrite(address, evt.spec, localEvents);
               continue;
             }
 
@@ -183,7 +154,6 @@ export function useGeneratedUi(address: string): GeneratedUiState {
               continue;
             }
 
-            // For all streamable events (tool-call, tool-result, status): update local mirror then React state
             const merged = mergeIntoLocal(evt);
 
             if (evt.type === "tool-call" && firstToolCall) {
@@ -196,21 +166,15 @@ export function useGeneratedUi(address: string): GeneratedUiState {
         }
       } catch (e) {
         if (abortController.signal.aborted) return;
-        if (nonceRef.current !== capturedNonce) return;
         setError(e instanceof Error ? e : new Error(String(e)));
         setStatus("error");
-      } finally {
-        inFlight.delete(inFlightKey);
       }
-    };
-
-    const promise = run();
-    inFlight.set(inFlightKey, promise);
+    })();
 
     return () => {
       abortController.abort();
     };
   }, [address, nonce]);
 
-  return { status, events, ui, error, regenerate };
+  return { status, events, spec, error, regenerate };
 }

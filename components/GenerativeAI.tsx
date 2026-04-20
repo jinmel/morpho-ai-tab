@@ -11,7 +11,7 @@ export function GenerativeAI({ fallbackAddress }: Props) {
   const { address: walletAddress, isConnected } = useAccount();
   const target = isConnected && walletAddress ? walletAddress : fallbackAddress;
 
-  const { status, events, ui, error, regenerate } = useGeneratedUi(target);
+  const { status, events, spec, error, regenerate } = useGeneratedUi(target);
 
   return (
     <div>
@@ -61,9 +61,9 @@ export function GenerativeAI({ fallbackAddress }: Props) {
         </>
       )}
 
-      {status === "ready" && ui && (
+      {status === "ready" && spec && (
         <>
-          <JsonRender ui={ui} />
+          <JsonRender spec={spec} />
           <details className="mt-3">
             <summary className="cursor-pointer text-[11px] text-muted hover:text-text/70 select-none">
               Show reasoning · {events.length} steps

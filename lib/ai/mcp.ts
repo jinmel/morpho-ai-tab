@@ -1,6 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { dynamicTool, jsonSchema, type ToolSet } from "ai";
+import { dynamicTool, jsonSchema, type ToolExecutionOptions, type ToolSet } from "ai";
 
 const MORPHO_MCP_URL = "https://mcp.morpho.org";
 
@@ -26,11 +26,15 @@ export async function createMorphoMCPSession(): Promise<MCPSession> {
     tools[t.name] = dynamicTool({
       description: t.description ?? t.name,
       inputSchema: jsonSchema(t.inputSchema as Record<string, unknown>),
-      execute: async (input: unknown) => {
-        const result = await client.callTool({
-          name: t.name,
-          arguments: (input ?? {}) as Record<string, unknown>,
-        });
+      execute: async (input: unknown, options: ToolExecutionOptions) => {
+        const result = await client.callTool(
+          {
+            name: t.name,
+            arguments: (input ?? {}) as Record<string, unknown>,
+          },
+          undefined,
+          { signal: options.abortSignal },
+        );
         return result;
       },
     });
