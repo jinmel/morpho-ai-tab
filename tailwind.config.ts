@@ -17,6 +17,11 @@ const config: Config = {
         muted: "#8a8f9c",
         positive: "#4ade80",
         negative: "#f87171",
+        chart: {
+          blue:   "#60a5fa",
+          purple: "#a78bfa",
+          amber:  "#fbbf24",
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
