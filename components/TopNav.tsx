@@ -1,11 +1,6 @@
-type Props = { address: string };
+import { ConnectWallet } from "./ConnectWallet";
 
-function truncate(addr: string): string {
-  if (addr.length < 12) return addr;
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
-}
-
-export function TopNav({ address }: Props) {
+export function TopNav() {
   return (
     <header className="border-b border-border">
       <div className="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between">
@@ -18,9 +13,7 @@ export function TopNav({ address }: Props) {
             <span className="text-text">Dashboard</span>
           </nav>
         </div>
-        <div className="rounded-full border border-border-2 px-3 py-1 text-sm text-text">
-          {truncate(address)}
-        </div>
+        <ConnectWallet />
       </div>
     </header>
   );

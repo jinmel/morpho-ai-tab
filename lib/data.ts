@@ -39,12 +39,6 @@ export const activity: ActivityRow[] = [
   { action: "Supply", asset: "USDC",  amountUsd: 40000, chain: "Base",     date: "2026-03-22" },
 ];
 
-export const aiSummaryParagraphs: string[] = [
-  "Your wallet holds **$142K in supplied assets** across two vaults, with a moderate **$13.7K borrow**. Net APY **+6.42%**, driven primarily by Steakhouse USDC (~42% of deployed capital).",
-  "The portfolio is **concentrated in stablecoin yield** — historically lower-variance but with stablecoin-specific risks (peg deviation, vault collateral composition). Your ETH exposure is primarily indirect through Gauntlet WETH Core.",
-  "**Risk is healthy.** Health factor sits at **1.82**, and a 30% drop in ETH would push it to roughly **1.28** — still above the 1.0 liquidation threshold. Diversifying across more vault curators or chains would reduce concentration risk.",
-];
-
 export type AllocationSlice = { name: string; valueUsd: number; pct: number; color: string };
 export const allocationData: AllocationSlice[] = [
   { name: "Steakhouse USDC",    valueUsd: 60000, pct: 42, color: "#4ade80" },

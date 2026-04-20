@@ -9,10 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.71",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@tanstack/react-query": "^5.99.2",
+    "ai": "^6.0.168",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "recharts": "^3.8.1"
+    "recharts": "^3.8.1",
+    "viem": "^2.48.1",
+    "wagmi": "^3.6.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

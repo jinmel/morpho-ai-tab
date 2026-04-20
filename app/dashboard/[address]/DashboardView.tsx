@@ -6,15 +6,15 @@ import { SummaryCards } from "@/components/SummaryCards";
 import { TabBar, type TabId } from "@/components/TabBar";
 import { PositionsTable } from "@/components/PositionsTable";
 import { ActivityTable } from "@/components/ActivityTable";
-import { AISummary } from "@/components/AISummary";
-import { positions, activity, summary, aiSummaryParagraphs } from "@/lib/data";
+import { GenerativeAI } from "@/components/GenerativeAI";
+import { positions, activity, summary } from "@/lib/data";
 
 export function DashboardView({ address }: { address: string }) {
   const [tab, setTab] = useState<TabId>("positions");
 
   return (
     <div>
-      <TopNav address={address} />
+      <TopNav />
 
       <main className="mx-auto max-w-6xl px-6 py-6">
         <div className="mb-5">
@@ -33,7 +33,7 @@ export function DashboardView({ address }: { address: string }) {
         <div>
           {tab === "positions" && <PositionsTable rows={positions} />}
           {tab === "activity"  && <ActivityTable rows={activity} />}
-          {tab === "ai"        && <AISummary paragraphs={aiSummaryParagraphs} />}
+          {tab === "ai"        && <GenerativeAI fallbackAddress={address} />}
         </div>
       </main>
     </div>
