@@ -140,3 +140,12 @@ The deliverable is a Next.js project that can be run locally (`npm run dev`) and
 ## Open Questions
 
 None. All decisions resolved during brainstorm.
+
+## How to run
+
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:3000.
